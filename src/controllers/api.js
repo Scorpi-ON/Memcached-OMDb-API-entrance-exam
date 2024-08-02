@@ -1,4 +1,5 @@
 const axios = require('axios');
+const ApiCache = require('../apicache/apicache')
 
 const API_URL = process.env.API_URL;
 
@@ -20,6 +21,18 @@ async function getData(req, res) {
     }
 }
 
+function deleteItem(req, res) {
+    const { itemToDelete } = req.body;
+    res.json({ test: ApiCache.clear(itemToDelete) });
+}
+
+async function updateItem(req, res) {
+    const { itemToUpdate } = req.body;
+    const api_res = await axios.get(API_URL, { params: req.query });
+}
+
 module.exports = {
-    getData
+    getData,
+    deleteItem,
+    updateItem
 };
