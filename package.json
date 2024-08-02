@@ -7,10 +7,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "express": "~4.16.1",
+    "express": "^4.19.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "node-cache": "5.1.2",
+    "apicache": "^1.6.3",
     "axios": "^1.7.3",
     "dotenv": "^16.4.5",
     "nodemon": "3.1.4"
