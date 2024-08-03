@@ -1,11 +1,9 @@
 const axios = require('axios');
 const ApiCache = require('../apicache/apicache')
 
-const API_URL = process.env.API_URL;
-
 async function getData(req, res) {
     try {
-        const api_res = await axios.get(API_URL, { params: req.query });
+        const api_res = await axios.get(process.env.API_URL, { params: req.query });
         res.send(api_res.data);
     } catch (error) {
         if (!error.response) {
