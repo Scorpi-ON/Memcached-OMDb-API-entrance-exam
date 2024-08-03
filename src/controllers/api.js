@@ -9,13 +9,13 @@ async function getData(req, res) {
         res.send(api_res.data);
     } catch (error) {
         if (!error.response) {
-            res.status(500).json({ error: 'Internal server error when executing the request' });
+            res.status(500).json({ error: 'Internal server error' });
             console.log('Ошибка в коде приложения: ', error);
             return;
         }
         res.status(error.response.status).json(error.response.data);
         console.log(
-            `Ошибка ${error.response.status} при выполнении ${error.request.method}-запроса ${error.request.res.responseUrl}:`,
+            `Ошибка ${error.response.status} при выполнении GET-запроса ${error.request.res.responseUrl}:`,
             error.response.data
         );
     }
