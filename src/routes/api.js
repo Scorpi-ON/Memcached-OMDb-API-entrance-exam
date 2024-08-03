@@ -3,8 +3,6 @@ const router = express.Router();
 const apiController = require('../controllers/api');
 const ApiCache = require('../apicache/apicache');
 
-const cache = ApiCache.middleware;
-
 function redirectToDocsIfNoParams (req, res, next) {
     if (Object.keys(req.query).length > 0) {
         next();
@@ -17,7 +15,7 @@ function redirectToDocsIfNoParams (req, res, next) {
     }
 }
 
-router.get('/', redirectToDocsIfNoParams, cache(), apiController.getData);
+router.get('/', redirectToDocsIfNoParams, ApiCache.middleware, apiController.getData);
 router.put('/', apiController.updateItem)
 router.delete('/', apiController.deleteItem)
 

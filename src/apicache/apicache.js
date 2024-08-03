@@ -3,8 +3,12 @@ const apicache = require('apicache');
 class ApiCache {
     static _maxSize = 3;
 
-    static get middleware() {
-        return apicache.middleware;
+    static middleware(req, res, next) {
+        const sortedKeys = Object.keys(req.query).sort();
+        req.originalUrl = '/api?' + sortedKeys.map(
+            key => `${key}=${req.query[key]}`
+        ).join('&');
+        apicache.middleware()(req, res, next)
     }
 
     static get items() {
