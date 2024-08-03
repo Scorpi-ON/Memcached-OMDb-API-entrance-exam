@@ -20,20 +20,21 @@ class ApiCache {
     }
 
     static set maxSize(value) {
-        if (!Number.isInteger(value) || value < 1) {
+        value = parseInt(value)
+        if (isNaN(value) || value < 1) {
             throw new Error('Invalid cache size');
         }
         if (value < this.size) {
             throw new Error(
                 `The cache size you are trying to set (${value}) is less than current` +
-                ` number of items in the cache (${this.size}): you must free up the cache first`
+                ` number of items in the cache (${this.size}). You must free up the cache first.`
             );
         }
         this._maxSize = value;
     }
 
     static clear(target = null)  {
-        return apicache.clear(target);
+        apicache.clear(target);
     }
 }
 
