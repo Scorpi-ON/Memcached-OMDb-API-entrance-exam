@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./src/utils/extendRequest')
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('js-yaml');

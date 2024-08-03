@@ -4,15 +4,12 @@ class ApiCache {
     static _maxSize = 3;
 
     static middleware(req, res, next) {
-        const sortedKeys = Object.keys(req.query).sort();
-        req.originalUrl = '/api?' + sortedKeys.map(
-            key => `${key}=${req.query[key]}`
-        ).join('&');
-        apicache.middleware()(req, res, next)
+        req.originalUrl = req.sortedOriginalUrl();
+        apicache.middleware()(req, res, next);
     }
 
     static get items() {
-        return apicache.getIndex()['all']
+        return apicache.getIndex()['all'];
     }
 
     static get size() {

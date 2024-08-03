@@ -21,7 +21,7 @@ async function getData(req, res) {
 
 function deleteItem(req, res) {
     try {
-        const itemToDelete = req.originalUrl;
+        const itemToDelete = req.sortedOriginalUrl();
         if (ApiCache.items.includes(itemToDelete)) {
             ApiCache.clear(itemToDelete)
             res.json({ message: itemToDelete + ' successfully deleted from the cache' });
@@ -37,10 +37,10 @@ function deleteItem(req, res) {
 async function updateItem(req, res) {
     let itemToUpdate;
     try {
-        itemToUpdate = req.originalUrl;
+        itemToUpdate = req.sortedOriginalUrl();
         if (ApiCache.items.includes(itemToUpdate)) {
             ApiCache.clear(itemToUpdate)
-            const requestUrl = `${req.protocol}://${req.host}:${process.env.PORT}${req.originalUrl}`;
+            const requestUrl = `${req.protocol}://${req.headers['host']}${itemToUpdate}`;
             await axios.get(requestUrl);
             res.json({ message: itemToUpdate + ' successfully updated' });
         } else {
