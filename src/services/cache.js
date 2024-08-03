@@ -39,4 +39,6 @@ class ApiCache {
     }
 }
 
-module.exports = ApiCache;
+module.exports = {
+    ApiCache
+};

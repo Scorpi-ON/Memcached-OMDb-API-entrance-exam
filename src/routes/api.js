@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/api');
-const ApiCache = require('../apicache/apicache');
+const {ApiCache} = require('../services/cache');
 const redirectToDocsIfNoParams = require('../utils/redirectToDocs')
 
 router.get('/', redirectToDocsIfNoParams, ApiCache.middleware, apiController.getData);

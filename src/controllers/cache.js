@@ -1,4 +1,5 @@
-const ApiCache = require('../apicache/apicache');
+const {ApiCache} = require('../services/cache');
+const errors = require('../utils/commonErrors');
 
 function getStats(req, res) {
     try {
@@ -7,8 +8,7 @@ function getStats(req, res) {
             items: ApiCache.items
         });
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-        console.log('Ошибка в коде приложения: ', error);
+        errors.serverError(res, error)
     }
 }
 
@@ -16,8 +16,7 @@ function getMaxSize (req, res) {
     try {
         res.json({ max_cache_size: ApiCache.maxSize })
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-        console.log('Ошибка в коде приложения: ', error);
+        errors.serverError(res, error)
     }
 }
 
@@ -29,10 +28,9 @@ function setMaxSize (req, res) {
     } catch (error) {
         if (error.message.includes('cache size')) {
             res.status(400).json({ error: error.message })
-            return;
+        } else {
+            errors.serverError(res, error)
         }
-        res.status(500).json({ error: 'Internal server error' });
-        console.log('Ошибка в коде приложения: ', error);
     }
 }
 
@@ -41,8 +39,7 @@ function clear (req, res) {
         ApiCache.clear();
         res.json({ message: 'Cache cleared successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-        console.log('Ошибка в коде приложения: ', error);
+        errors.serverError(res, error)
     }
 }
 
