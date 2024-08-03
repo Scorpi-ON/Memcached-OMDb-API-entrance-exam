@@ -1,0 +1,559 @@
+openapi: 3.1.0
+info:
+  title: Memcached OMDb API
+  description: >-
+    Extension of [OMDb API](https://www.omdbapi.com/) with in-memory cache
+    supporting CRUD operations
+  contact:
+    email: s.scorpi-on@ya.ru
+  version: 1.0.0
+externalDocs:
+  description: Project homepage
+  url: 'https://github.com/Scorpi-ON/back-end-entrance-exam'
+servers:
+  - url: 'http://localhost:3000/'
+tags:
+  - name: redirects
+    description: Redirections to another pages
+  - name: api
+    description: Requests to OMDb API
+  - name: cache
+    description: Operations with cache
+paths:
+  /:
+    get:
+      tags:
+        - redirects
+      summary: Redirect user to the project homepage
+      operationId: redirectUser
+      responses:
+        '200':
+          description: Successful redirect
+        '500':
+          $ref: '#/components/responses/500'
+  /api:
+    get:
+      tags:
+        - api
+      summary: Execute memcached request to OMDb API
+      description: >-
+        The "s" parameter is required if you extract data using filters, whereas
+        one of the "i" and "t" is required if you extract data by IMDb ID or
+        movie title.
+        
+        With no params redirects to this API docs.
+      operationId: getSearchData
+      parameters:
+        - $ref: '#/components/parameters/s'
+        - $ref: '#/components/parameters/i'
+        - $ref: '#/components/parameters/t'
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/y'
+        - $ref: '#/components/parameters/plot'
+        - $ref: '#/components/parameters/r'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/callback'
+        - $ref: '#/components/parameters/v'
+      responses:
+        '200':
+          content:
+            text/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DetailedMovie'
+                  - $ref: '#/components/schemas/SearchResponse'
+                  - $ref: '#/components/schemas/ApiError'
+              examples:
+                By ID or title:
+                  $ref: '#/components/examples/DetailedMovie'
+                By search:
+                  $ref: '#/components/examples/SearchResponse'
+                Error:
+                  $ref: '#/components/examples/ApiError'
+        '308':
+          description: If no params passed to the API, redirects user to this docs
+        '401':
+          description: Missing OMDb API key
+          content:
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                Response: "False"
+                Error: Invalid API key!
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - OMDb-API-key: []
+    put:
+      tags:
+        - api
+      summary: Update gotten response in the cache
+      operationId: updateItem
+      parameters:
+        - $ref: '#/components/parameters/s'
+        - $ref: '#/components/parameters/i'
+        - $ref: '#/components/parameters/t'
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/y'
+        - $ref: '#/components/parameters/plot'
+        - $ref: '#/components/parameters/r'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/callback'
+        - $ref: '#/components/parameters/v'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - OMDb-API-key: []
+    delete:
+      tags:
+        - api
+      summary: Delete gotten response from the cache storage (if present)
+      operationId: deleteItem
+      parameters:
+        - $ref: '#/components/parameters/s'
+        - $ref: '#/components/parameters/i'
+        - $ref: '#/components/parameters/t'
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/y'
+        - $ref: '#/components/parameters/plot'
+        - $ref: '#/components/parameters/r'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/callback'
+        - $ref: '#/components/parameters/v'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+        - OMDb-API-key: []
+  /cache:
+    get:
+      tags:
+        - cache
+      summary: Get currently cached items and their number
+      operationId: getStats
+      responses:
+        '200':
+          content:
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Cache'
+              example:
+                size: 2
+                items:
+                  - /api?apikey=18eaeb4f&s=test
+                  - /api?apikey=18eaeb4f&s=love
+        '500':
+          $ref: '#/components/responses/500'
+  /cache/maxsize:
+    get:
+      tags:
+        - cache
+      summary: Get max cache size
+      operationId: getMaxSize
+      responses:
+        '200':
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  max_cache_size: integer
+              example:
+                max_cache_size: 100
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - cache
+      summary: Set max cache size
+      operationId: setMaxSize
+      parameters:
+        - name: value
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  message: string
+              example:
+                message: Max cache size set to 4
+        '400':
+          description: Invalid cache size
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  message: string
+              example:
+                message: >-
+                  The cache size you are trying to set (1) is less than current 
+                  number of items in the cache (2). You must free up the cache first.
+        '500':
+          $ref: '#/components/responses/500'
+  /cache/clear-all:
+    delete:
+      tags:
+        - cache
+      summary: Delete all items in the cache
+      operationId: clear
+      responses:
+        '200':
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  message: string
+              example:
+                message: Cache cleared successfully
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  responses:
+    '200':
+      content:
+        text/json:
+          schema:
+            type: object
+            properties:
+              message: string
+          example:
+            message: /api?s=love successfully updated from the cache
+    '404':
+      description: This response is not cached
+      content:
+        text/json:
+          schema:
+            type: object
+            properties:
+              message: string
+            example:
+              message: /api?s=love is not cached, nothing to delete
+    '500':
+      description: Internal server error when executing the request
+      content:
+        text/json:
+          schema:
+            $ref: '#/components/schemas/ServerError'
+          example:
+            error: Internal server error
+  securitySchemes:
+    OMDb-API-key:
+      type: apiKey
+      name: apikey
+      in: query
+  schemas:
+    Cache:
+      type: object
+      properties:
+        size: integer
+        items:
+          type: array
+          items:
+            type: string
+    ServerError:
+      type: object
+      description: Internal server error
+      properties:
+        error:
+          type: string
+    ApiError:
+      type: object
+      description: Error response returned by OMDb API.
+      properties:
+        Response:
+          type: string
+        Error:
+          type: string
+    SearchResponse:
+      type: object
+      description: 10 search items representing short movie data.
+      properties:
+        Search:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchMovieItem'
+        totalResults:
+          type: string
+        Response:
+          type: string
+    SearchMovieItem:
+      type: object
+      summary: Search item representing short movie data.
+      properties:
+        Title:
+          type: string
+        Year:
+          type: string
+        imdbID:
+          type: string
+        Type:
+          type: string
+        Poster:
+          type: string
+          format: uri
+    DetailedMovie:
+      type: object
+      description: Full data of a single movie.
+      properties:
+        Title:
+          type: string
+        Year:
+          type: string
+        Rated:
+          type: string
+        Released:
+          type: string
+        Runtime:
+          type: string
+        Genre:
+          type: string
+        Director:
+          type: string
+        Writer:
+          type: string
+        Actors:
+          type: string
+        Plot:
+          type: string
+        Language:
+          type: string
+        Country:
+          type: string
+        Awards:
+          type: string
+        Poster:
+          type: string
+          format: uri
+        Ratings:
+          type: array
+          items:
+            type: object
+            properties:
+              Source:
+                type: string
+              Value:
+                type: string
+        Metascore:
+          type: string
+        imdbRating:
+          type: string
+        imdbVotes:
+          type: string
+        imdbID:
+          type: string
+        Type:
+          type: string
+        DVD:
+          type: string
+        BoxOffice:
+          type: string
+        Production:
+          type: string
+        Website:
+          type: string
+        Response:
+          type: string
+  examples:
+    ApiError:
+      value:
+        Response: "False"
+        Error: Incorrect IMDb ID.
+    DetailedMovie:
+      value:
+        Title: >-
+          The Chronicles of Narnia: The Lion, the Witch and the
+          Wardrobe
+        Year: '2005'
+        Rated: PG
+        Released: 09 Dec 2005
+        Runtime: 143 min
+        Genre: 'Adventure, Family, Fantasy'
+        Director: Andrew Adamson
+        Writer: 'Ann Peacock, Andrew Adamson, Christopher Markus'
+        Actors: 'Tilda Swinton, Georgie Henley, William Moseley'
+        Plot: >-
+          While playing, Lucy and her siblings find a wardrobe that
+          lands them in a mystical place called Narnia. Here they
+          realize that it was fated and they must now unite with
+          Aslan to defeat an evil queen.
+        Language: 'English, German, Brazilian Sign '
+        Country: 'United Kingdom, United States'
+        Awards: Won 1 Oscar. 18 wins & 46 nominations total
+        Poster: >-
+          https://m.media-amazon.com/images/M/MV5BMTc0NTUwMTU5OV5BMl5BanBnXkFtZTcwNjAwNzQzMw@@._V1_SX300.jpg
+        Ratings:
+          - Source: Internet Movie Database
+            Value: 6.9/10
+          - Source: Rotten Tomatoes
+            Value: 75%
+          - Source: Metacritic
+            Value: 75/100
+        Metascore: '75'
+        imdbRating: '6.9'
+        imdbVotes: '430,142'
+        imdbID: tt0363771
+        Type: movie
+        DVD: N/A
+        BoxOffice: '$291,710,957'
+        Production: N/A
+        Website: N/A
+        Response: 'True'
+    SearchResponse:
+      value:
+        Search:
+          - Title: >-
+              The Chronicles of Narnia: The Lion, the Witch and the
+              Wardrobe
+            Year: '2005'
+            imdbID: tt0363771
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMTc0NTUwMTU5OV5BMl5BanBnXkFtZTcwNjAwNzQzMw@@._V1_SX300.jpg
+          - Title: The Witch
+            Year: '2015'
+            imdbID: tt4263482
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMTUyNzkwMzAxOF5BMl5BanBnXkFtZTgwMzc1OTk1NjE@._V1_SX300.jpg
+          - Title: The Blair Witch Project
+            Year: '1999'
+            imdbID: tt0185937
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BNzQ1NDBlNDItMDAyYS00YTI2LTgwMmYtMzAwMzg4NDFlM2ZmXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg
+          - Title: 'Hansel & Gretel: Witch Hunters'
+            Year: '2013'
+            imdbID: tt1428538
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMjA4MDQwODg2NV5BMl5BanBnXkFtZTcwNTc5ODc2OA@@._V1_SX300.jpg
+          - Title: The Last Witch Hunter
+            Year: '2015'
+            imdbID: tt1618442
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMjM5Njk5MzYzM15BMl5BanBnXkFtZTgwNzM1Mjk4NjE@._V1_SX300.jpg
+          - Title: Season of the Witch
+            Year: '2011'
+            imdbID: tt0479997
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMzc3MjYxNzg2N15BMl5BanBnXkFtZTcwNzQyMTkwNA@@._V1_SX300.jpg
+          - Title: Race to Witch Mountain
+            Year: '2009'
+            imdbID: tt1075417
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMzQ5MTM5NTU2NV5BMl5BanBnXkFtZTcwMDAzMjAyMg@@._V1_SX300.jpg
+          - Title: 'Halloween III: Season of the Witch'
+            Year: '1982'
+            imdbID: tt0085636
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BN2YzYjI0MWYtYWUyZS00ZDQ4LWEzN2EtMDU4NDJmNjA2ZWFiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg
+          - Title: Blair Witch
+            Year: '2016'
+            imdbID: tt1540011
+            Type: movie
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BMjI0NTEyMjA3NV5BMl5BanBnXkFtZTgwODk5OTU4OTE@._V1_SX300.jpg
+          - Title: Sabrina the Teenage Witch
+            Year: 1996–2003
+            imdbID: tt0115341
+            Type: series
+            Poster: >-
+              https://m.media-amazon.com/images/M/MV5BNjRkODcyMGMtYTk4Zi00NzY4LWIwNmQtOTU0MjQ4MTRiZjQyXkEyXkFqcGdeQXVyODY0NzcxNw@@._V1_SX300.jpg
+        totalResults: '741'
+        Response: 'True'
+  parameters:
+    s:
+      name: s
+      description: Movie title to search for
+      in: query
+      schema:
+        type: string
+    i:
+      name: i
+      description: A valid IMDb ID (e.g. tt1285016)
+      in: query
+      schema:
+        type: string
+    t:
+      name: t
+      description: Movie title to search for
+      in: query
+      schema:
+        type: string
+    type:
+      name: type
+      description: Type of result to return
+      in: query
+      schema:
+        type: string
+        enum:
+          - movie
+          - series
+          - episode
+    y:
+      name: y
+      description: Year of release
+      in: query
+      schema:
+        type: integer
+    plot:
+      name: plot
+      description: Return short or full plot (default — short)
+      in: query
+      schema:
+        type: string
+        enum:
+          - short
+          - full
+    r:
+      name: r
+      description: The data type to return (default — json)
+      in: query
+      schema:
+        type: string
+        enum:
+          - json
+          - xml
+    page:
+      name: page
+      description: Page number from 1 to 100 to return (default — 1)
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+    callback:
+      name: callback
+      description: JSONP callback name
+      in: query
+      schema:
+        type: string
+    v:
+      name: v
+      description: API version [reserved for future use] (default — 1)
+      in: query
+      schema:
+        type: integer
