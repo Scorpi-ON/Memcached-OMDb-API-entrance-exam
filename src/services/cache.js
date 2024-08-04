@@ -1,7 +1,7 @@
 const apicache = require('apicache');
 
 class ApiCache {
-    static _maxSize = 3;
+    static _maxSize = 10;
 
     static middleware(req, res, next) {
         req.originalUrl = req.sortedOriginalUrl();
