@@ -6,7 +6,7 @@ const errors = require('../utils/commonErrors');
 async function getData(req, res) {
     try {
         const api_res = await axios.get(process.env.API_URL, { params: req.query });
-        const status = ApiCache.isFull ? 304 : 200;
+        const status = ApiCache.isFull ? 207 : 200;
         res.status(status).send(api_res.data);
     } catch (error) {
         if (!error.response) {

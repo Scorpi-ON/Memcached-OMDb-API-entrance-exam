@@ -39,7 +39,9 @@ paths:
       operationId: docs
       responses:
         '200':
-          description: Successful request
+          description: Successful redirect
+        '500':
+          $ref: '#/components/responses/500'
   /api:
     get:
       tags:
@@ -80,7 +82,7 @@ paths:
                   $ref: '#/components/examples/SearchResponse'
                 Error:
                   $ref: '#/components/examples/ApiError'
-        '304':
+        '207':
           description: If the cache is full, server processes new requests to the API without caching
         '308':
           description: If no params passed to the API, redirects user to this docs
