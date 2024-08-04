@@ -13,17 +13,17 @@ externalDocs:
 servers:
   - url: 'http://localhost:3000/'
 tags:
-  - name: redirects
-    description: Redirections to another pages
   - name: api
     description: Requests to OMDb API
   - name: cache
     description: Operations with cache
+  - name: docs
+    description: Documentation
 paths:
   /:
     get:
       tags:
-        - redirects
+        - docs
       summary: Redirect user to the project homepage
       operationId: redirectUser
       responses:
@@ -31,10 +31,20 @@ paths:
           description: Successful redirect
         '500':
           $ref: '#/components/responses/500'
+  /docs:
+    get:
+      tags:
+        - docs
+      summary: Documentation to this API
+      operationId: docs
+      responses:
+        '200':
+          description: Successful request
   /api:
     get:
       tags:
         - api
+        - docs
       summary: Execute memcached request to OMDb API
       description: >-
         The "s" parameter is required if you extract data using filters, whereas
