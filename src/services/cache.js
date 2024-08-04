@@ -5,7 +5,11 @@ class ApiCache {
 
     static middleware(req, res, next) {
         req.originalUrl = req.sortedOriginalUrl();
-        apicache.middleware()(req, res, next);
+        if (ApiCache.isFull && !ApiCache.items.includes(req.originalUrl)) {
+            next();
+        } else {
+            apicache.middleware()(req, res, next);
+        }
     }
 
     static get items() {
@@ -18,6 +22,10 @@ class ApiCache {
 
     static get maxSize() {
         return this._maxSize;
+    }
+
+    static get isFull() {
+        return this.size === this._maxSize;
     }
 
     static set maxSize(value) {
