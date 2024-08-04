@@ -37,7 +37,7 @@
 - **DELETE /cache/clear-all** — полная очистка кеша
 
 ## Используемые технологии
-- Node.js — язык программирования
+- Node.js — программная платформа
 - [Express](https://github.com/expressjs/express) — фреймворк для бэкенда
 - [apicache](https://github.com/kwhitley/apicache) — библиотека для in-memory кеширования ответов API
 - [Swagger UI Express](https://github.com/scottie1984/swagger-ui-express) — документация к API
