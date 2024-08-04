@@ -501,7 +501,7 @@ components:
   parameters:
     s:
       name: s
-      description: Movie title to search for
+      description: Search query
       in: query
       schema:
         type: string
