@@ -39,7 +39,7 @@
 - **PUT /cache/maxsize** — установка максимального размера кеша (параметр value передаётся в query)
 - **DELETE /cache/clear-all** — полная очистка кеша
 
-## Используемые технологии
+## Стек
 - Node.js — программная платформа
 - [Express](https://github.com/expressjs/express) — фреймворк для бэкенда
 - [apicache](https://github.com/kwhitley/apicache) — библиотека для in-memory кеширования ответов API
