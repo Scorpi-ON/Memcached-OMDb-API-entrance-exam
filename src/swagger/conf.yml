@@ -6,7 +6,7 @@ info:
     supporting CRUD operations
   contact:
     email: s.scorpi-on@ya.ru
-  version: 1.0.0
+  version: 0.0.1
 externalDocs:
   description: Project homepage
   url: 'https://github.com/Scorpi-ON/back-end-entrance-exam'

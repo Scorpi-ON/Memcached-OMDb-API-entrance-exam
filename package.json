@@ -1,6 +1,6 @@
 {
-  "name": "back-end-entrance-exam",
-  "version": "0.0.0",
+  "name": "memcached-omdb-api-entrance-exam",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "nodemon app.js",
@@ -8,16 +8,16 @@
   },
   "dependencies": {
     "apicache": "^1.6.3",
-    "axios": "^1.7.3",
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "js-yaml": "^4.1.0",
-    "nodemon": "3.1.4",
+    "nodemon": "3.1.7",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.8.0",
-    "eslint": "^9.8.0",
-    "globals": "^15.9.0"
+    "@eslint/js": "^9.14.0",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0"
   }
 }
