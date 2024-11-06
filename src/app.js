@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./src/utils/extendRequest')
+require('./utils/extendRequest')
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('js-yaml');
@@ -8,8 +8,8 @@ const swaggerConfig = yaml.load(fs.readFileSync(
     './src/swagger/conf.yml',
     { encoding: 'utf8' }
 ));
-const apiRouter = require('./src/routes/api');
-const cacheRouter = require('./src/routes/cache');
+const apiRouter = require('./routes/api');
+const cacheRouter = require('./routes/cache');
 
 const app = express();
 
